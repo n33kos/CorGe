@@ -1,2 +1,5 @@
 # CorGe
-CorGe (Correspondence Generator) is a ruby script to organize and managed automated correspondence via templates.
+CorGe (Correspondence Generator) is a configurable ruby template processor developed for automated correspondence.
+
+# Requirements
+- Ruby
