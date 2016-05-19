@@ -1,0 +1,2 @@
+template: test/template_test.rb
+csv: test/test_data.csv
