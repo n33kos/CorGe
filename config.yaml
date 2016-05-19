@@ -2,8 +2,10 @@
 :template: test/template_test.rb
 :csv: test/test_data.csv
 :generated: generated/
+:generated_filename_prefix: message_
 
 #---------Mail Defaults------------------
+:send_mail: false
 :to_email: CorGeTest@mailinator.com
 :from_email: email@person.com
 :subject: Test Email
