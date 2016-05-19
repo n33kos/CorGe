@@ -1,2 +1,18 @@
-template: test/template_test.rb
-csv: test/test_data.csv
+#---------Generation Defaults------------
+:template: test/template_test.rb
+:csv: test/test_data.csv
+:generated: generated/
+
+#---------Mail Defaults------------------
+:to_email: CorGeTest@mailinator.com
+:from_email: email@person.com
+:subject: Test Email
+:body: Please disregard this test email message.
+:mail_options: 
+  :address: smtp.gmail.com
+  :port: 587
+  :domain: your.host.name
+  :user_name: <username>
+  :password: <password>
+  :authentication: plain
+  :enable_starttls_auto: true
