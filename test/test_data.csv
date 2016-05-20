@@ -1,4 +1,4 @@
-First Name,Last Name,Email,Phone Number
-Nick,Testerson,nick@test.com,555-555-5555
-Jill,Testingville,jill@test.com,555-555-5555
-Jim,Testinglayton,jim@test.com,555-555-5555
+Subject,First Name,Last Name,Email,Phone Number,attachments
+Applicant Query,Nick,Testerson,guy,555-555-5555,test/test_data.csv|test/template_test.rb
+Next Thurdsay,Jill,Testingville,,555-555-5555,
+Annual Beer Festival,Jim,Testinglayton,,555-555-5555,

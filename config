@@ -1,11 +1,12 @@
-#---------Generation Defaults------------
+#---------Generation Options------------
 :template: test/template_test.rb
 :csv: test/test_data.csv
 :generated: generated/
 :generated_filename_prefix: message_
 
-#---------Mail Defaults------------------
+#---------Mail Options------------------
 :send_mail: false
+:prompt_credentials: true
 :to_email: CorGeTest@mailinator.com
 :from_email: email@person.com
 :subject: Test Email
@@ -13,7 +14,7 @@
 :mail_options: 
   :address: smtp.gmail.com
   :port: 587
-  :domain: your.host.name
+  :domain: gmail.com
   :user_name: <username>
   :password: <password>
   :authentication: plain
