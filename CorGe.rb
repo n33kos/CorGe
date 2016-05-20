@@ -1,6 +1,6 @@
-puts "------------------------------------------"
-puts "---Correspondence Generator (CorGe) v0.0.2"
-puts "------------------------------------------"
+puts "\n---------------------------------------------"
+puts "---CorGe (Correspondence Generator) v0.0.3---"
+puts "---------------------------------------------"
 require 'yaml'
 require 'csv'
 require 'mail'
@@ -8,7 +8,6 @@ require 'highline/import'
 
 #------------Functions----------
 def ui_main
-	puts "\n------------Manage Messages------------"
 	puts "1. Generate Messages"
 	puts "2. Send Messages"
 	puts "3. List Messages"
@@ -51,7 +50,7 @@ def ui_main
 		end
 		ui_main
 	elsif input == "8"
-		puts "You're skilled and awesome! Have a good day!"
+		puts "Have a great day!"
 	else
 		puts "\nUnrecognized Input."
 		ui_main
@@ -132,18 +131,22 @@ end
 
 def read_message files
 	files.each do |file|
-		puts "\n------------"+file+"-------------"
-		message = YAML.load_file(file)
-		if message.empty?
-			puts "There was an error displaying "+file
-		else
-			puts "To:"+(message[:to_email].to_s || @config[:to_email].to_s)
-			puts "From: "+(message[:from_email].to_s || @config[:from_email].to_s)
-			puts 'Subject: '+(message[:subject].to_s || @config[:subject].to_s)
-			puts "Body: "+(message[:body].to_s || @config[:body].to_s)
-			if message[:attachments]
-				puts "Attachments: "+message[:attachments].join(",")
+		if File.exist?(file)
+			puts "\n------------"+file+"-------------"
+			message = YAML.load_file(file)
+			if message.empty?
+				puts "There was an error displaying "+file
+			else
+				puts "To:"+(message[:to_email].to_s || @config[:to_email].to_s)
+				puts "From: "+(message[:from_email].to_s || @config[:from_email].to_s)
+				puts 'Subject: '+(message[:subject].to_s || @config[:subject].to_s)
+				puts "Body: "+(message[:body].to_s || @config[:body].to_s)
+				if message[:attachments]
+					puts "Attachments: "+message[:attachments].join(",")
+				end
 			end
+		else
+			puts file+" does not exist."
 		end
 	end
 end
@@ -167,15 +170,19 @@ end
 
 def mark_as_sent files
 	files.to_a.each do |file|
-		if file.include? ".corge"
-			if file.include? ".sent"
-				puts "file "+file+" is already marked as sent"
+		if File.exist?(file)
+			if file.include? ".corge"
+				if file.include? ".sent"
+					puts "file "+file+" is already marked as sent"
+				else
+					File.rename(file, file+".sent")
+					puts file+" Marked as sent."
+				end
 			else
-				File.rename(file, file+".sent")
-				puts file+" Marked as sent."
+				puts file+" is not a valid .corge file"
 			end
 		else
-			puts file+" is not a valid .corge file"
+			puts file+" does not exist."
 		end
 	end
 end
@@ -189,4 +196,48 @@ end
 
 #------------Init----------
 read_configs
-ui_main
+if ARGV.length > 0
+	if ARGV[0] == "generate" or ARGV[0] == "g"
+		generate_from_csv(@config[:generated],@config[:csv],@config[:template])
+	elsif ARGV[0] == "send"
+		if @config[:send_mail]
+			email_options @config[:mail_options]
+			send_generated_messages
+		else
+			puts "\nsend_mail is disabled, adjust the config file to send messages."
+		end
+	elsif ARGV[0] == "list"
+		if ARGV[1]
+			if ARGV[1] == "sent"
+				list_messages ".sent"
+			else
+				list_messages ARGV[1]
+			end
+		else
+			list_messages ".corge"
+		end
+	elsif ARGV[0] == "read"
+		if ARGV.length > 1
+			temp_arr = ARGV.drop(1)
+			read_message temp_arr
+		else
+			filenames = ask("\nEnter Message File Path(s): ")
+			read_message filenames.split(" ")
+		end
+	elsif ARGV[0] == "sent"
+		if ARGV.length > 1
+			temp_arr = ARGV.drop(1)
+			mark_as_sent temp_arr
+		else
+			filenames = ask("\nEnter Message File Path(s): ")
+			mark_as_sent filenames.split(" ")
+		end
+	elsif ARGV[0] == "delete"
+		verify = ask("\nAre you sure you want to delete all messages with .sent extension? y/n")
+		if verify == "y"
+			delete_sent_messages
+		end
+	end
+else
+	ui_main
+end
