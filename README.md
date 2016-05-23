@@ -2,7 +2,7 @@
 CorGe (Correspondence Generator) is a configurable ruby template processor developed for automated correspondence.
 
 # Dependencies
-- Ruby v2.0.0
+- Ruby >=v2.0.0
 - Gems:
 	- mail
 	- highline
@@ -14,10 +14,10 @@ CorGe (Correspondence Generator) is a configurable ruby template processor devel
 - Run "Ruby CorGe.rb" or use the arguments for stdin/stdout
 
 # Arguments
-```ruby CorGe.rb``` - Loads UI
-```ruby CorGe.rb generate``` - Generates messages from CSV
-```ruby CorGe.rb list``` - Lists Generated Messages
-```ruby CorGe.rb list sent``` - Lists Generated Messages
-```ruby CorGe.rb read``` - Read message(s) from path
-```ruby CorGe.rb sent``` - Mark message(s) as sent 
-```ruby CorGe.rb delete``` - Delete all sent messages
+> - ```ruby CorGe.rb``` - Loads UI
+> - ```ruby CorGe.rb generate``` - Generates messages from CSV
+> - ```ruby CorGe.rb list``` - Lists Generated Messages
+> - ```ruby CorGe.rb list sent``` - Lists Generated Messages
+> - ```ruby CorGe.rb read``` - Read message(s) from path
+> - ```ruby CorGe.rb sent``` - Mark message(s) as sent 
+> - ```ruby CorGe.rb delete``` - Delete all sent messages
