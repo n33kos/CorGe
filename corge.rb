@@ -3,8 +3,8 @@ puts "---CorGe (Correspondence Generator) v0.0.4---"
 puts "---------------------------------------------"
 require 'yaml'
 require 'csv'
-require 'mail'
-require 'highline/import'
+require 'bundler/setup'
+Bundler.require(:default)
 
 #------------Functions----------
 def ui_main
