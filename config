@@ -1,6 +1,6 @@
 #---------Generation Options------------
-:template: test/template_test.rb
-:csv: test/test_data.csv
+:template: templates/template_test.rb
+:csv: csv/test_data.csv
 :generated: generated/
 :generated_filename_prefix: message_
 

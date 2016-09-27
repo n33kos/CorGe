@@ -1,5 +1,5 @@
 puts "\n---------------------------------------------"
-puts "---CorGe (Correspondence Generator) v0.0.3---"
+puts "---CorGe (Correspondence Generator) v0.0.4---"
 puts "---------------------------------------------"
 require 'yaml'
 require 'csv'
@@ -9,8 +9,8 @@ require 'highline/import'
 #------------Functions----------
 def ui_main
 	puts "1. Generate Messages"
-	puts "2. Send Messages"
-	puts "3. List Messages"
+	puts "2. Send Generated Messages"
+	puts "3. List Generated Messages"
 	puts "4. List Sent Messages"
 	puts "5. Read Message"
 	puts "6. Mark Message As Sent"
@@ -20,6 +20,8 @@ def ui_main
 
 	if input == "1"
 		generate_from_csv(@config[:generated],@config[:csv],@config[:template])
+
+		puts "\n"
 		ui_main
 	elsif input == "2"
 		if @config[:send_mail]
@@ -28,31 +30,45 @@ def ui_main
 		else
 			puts "\nsend_mail is disabled, adjust the config file to send messages."
 		end
+
+		puts "\n"
 		ui_main
 	elsif input == "3"
 		list_messages ".corge"
+
+		puts "\n"
 		ui_main
 	elsif input == "4"
 		list_messages ".sent"
+
+		puts "\n"
 		ui_main
 	elsif input == "5"
 		filenames = ask("\nEnter Message File Path(s): ")
 		read_message filenames.split(" ")
+
+		puts "\n"
 		ui_main
 	elsif input == "6"
 		filenames = ask("\nEnter Message File Path(s): ")
 		mark_as_sent filenames.split(" ")
+
+		puts "\n"
 		ui_main
 	elsif input == "7"
 		verify = ask("\nAre you sure? y/n")
 		if verify == "y"
 			delete_sent_messages
 		end
+
+		puts "\n"
 		ui_main
 	elsif input == "8"
-		puts "Have a great day!"
+		puts "Have a great day!\n"
 	else
 		puts "\nUnrecognized Input."
+
+		puts "\n"
 		ui_main
 	end
 end
@@ -80,36 +96,51 @@ def generate_from_csv output_path, csv_path, template_path
 			template = File.open(template_path, 'r')
 			output = File.open(output_path+@config[:generated_filename_prefix]+row[0].gsub(/ /, "_")+"_"+Time.now.strftime('%Y-%m-%d_%H%M%S')+".corge", 'w')
 			
-			#special fields and attachents
-			row.each_with_index do |r,i|
-				if titles[i].downcase == "email"
-					output.puts ":to_email: "+row[i].to_s
-				end
-				if titles[i].downcase == "attachments"
-					output.puts ":attachments: "
-					row[i].to_s.split('|').each do |attach|
-						output.puts "    - "+attach.to_s
+			if @config[:send_mail]
+				#special fields and attachents
+				row.each_with_index do |r,i|
+					if titles[i].downcase == "email"
+						output.puts ":to_email: "+row[i].to_s
+					end
+					if titles[i].downcase == "attachments"
+						output.puts ":attachments: "
+						row[i].to_s.split('|').each do |attach|
+							output.puts "    - "+attach.to_s
+						end
+					end
+					if titles[i].downcase == "subject"
+						output.puts ":subject: "+row[i].to_s
 					end
 				end
-				if titles[i].downcase == "subject"
-					output.puts ":subject: "+row[i].to_s
+
+				#body
+				output.print ":body: \""
+				template.each_line do |line|
+					replace = {}
+					row.each_with_index do |r, i|
+						if r.to_s.strip.empty?
+							replace['{'+titles[i].to_s+'}'] = titles[i].to_s
+						else
+							replace['{'+titles[i].to_s+'}'] = r
+						end
+					end
+					output.print(line.gsub(/(\{.+?\})/, replace)+"\n")
+				end
+				output.print "\""
+			else
+				template.each_line do |line|
+					replace = {}
+					row.each_with_index do |r, i|
+						if r.to_s.strip.empty?
+							replace['{'+titles[i].to_s+'}'] = titles[i].to_s
+						else
+							replace['{'+titles[i].to_s+'}'] = r
+						end
+					end
+					output.print(line.gsub(/(\{.+?\})/, replace)+"\n")
 				end
 			end
 
-			#body
-			output.print ":body: \""
-			template.each_line do |line|
-				replace = {}
-				row.each_with_index do |r, i|
-					if r.to_s.strip.empty?
-						replace['{'+titles[i].to_s+'}'] = titles[i].to_s
-					else
-						replace['{'+titles[i].to_s+'}'] = r
-					end
-				end
-				output.print(line.gsub(/(\{.+?\})/, replace)+"\n")
-			end
-			output.print "\""
 			print "generated "+output_path+@config[:generated_filename_prefix]+row[0].gsub(/ /, "_")+"_"+Time.now.strftime('%Y-%m-%d_%H%M%S')+".corge"+".\n"
 			output.close
 			template.close
@@ -136,13 +167,17 @@ def read_message files
 			message = YAML.load_file(file)
 			if message.empty?
 				puts "There was an error displaying "+file
-			else
-				puts "To:"+(message[:to_email].to_s || @config[:to_email].to_s)
-				puts "From: "+(message[:from_email].to_s || @config[:from_email].to_s)
-				puts 'Subject: '+(message[:subject].to_s || @config[:subject].to_s)
-				puts "Body: "+(message[:body].to_s || @config[:body].to_s)
-				if message[:attachments]
-					puts "Attachments: "+message[:attachments].join(",")
+			else 
+				if message.is_a?(String)
+					puts message
+				else
+					puts "To:"+(message[:to_email].to_s || @config[:to_email].to_s)
+					puts "From: "+(message[:from_email].to_s || @config[:from_email].to_s)
+					puts 'Subject: '+(message[:subject].to_s || @config[:subject].to_s)
+					puts "Body: "+(message[:body].to_s || @config[:body].to_s)
+					if message[:attachments]
+						puts "Attachments: "+message[:attachments].join(",")
+					end
 				end
 			end
 		else
